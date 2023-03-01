@@ -9,13 +9,13 @@ import akka.util.Timeout
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
-class MainRouter(wikipediaActor: ActorRef)(implicit system: ActorSystem)
+class MainRouter(wikiTitlesActor: ActorRef, wikiArticleActor: ActorRef)(implicit system: ActorSystem)
 {
   
   implicit val dispatcher: ExecutionContext = system.dispatcher
   implicit val timeout: Timeout = Timeout(30.seconds)
 
-  val textExtractorRoutes = TextExtractorRoutes(wikipediaActor)
+  val textExtractorRoutes = TextExtractorRoutes(wikiTitlesActor, wikiArticleActor)
   val pingRoutes = Ping()
 
   val routes: Route = {

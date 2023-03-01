@@ -3,8 +3,9 @@ package com.tudux.app
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.getFromResourceDirectory
-import com.tudux.actors.WikipediaActor
+import com.tudux.actors.{WikipediaArticleActor, WikipediaTitleActor}
 import com.tudux.http.routes.MainRouter
+import com.tudux.wikipedia.WikipediaCallsLihaoyi
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.ExecutionContext
@@ -12,14 +13,14 @@ import scala.util.{Failure, Success}
 
 object App extends App {
 
-  def startHttpServer(wikipediaActor: ActorRef)(implicit system: ActorSystem): Unit = {
+  def startHttpServer(wikipediaTitlesActor: ActorRef, wikipediaArticleActor: ActorRef)(implicit system: ActorSystem): Unit = {
 
     implicit val scheduler: ExecutionContext = system.dispatcher
 
     val host = "0.0.0.0"
     val port = sys.env.getOrElse("PORT", "10001").toInt
 
-    val router = new MainRouter(wikipediaActor)
+    val router = new MainRouter(wikipediaTitlesActor, wikipediaArticleActor)
     val routes = router.routes
 
     val bindingFuture = Http().newServerAt(host, port).bind(routes)
@@ -37,10 +38,10 @@ object App extends App {
   }
 
   val config = ConfigFactory.load("application.conf").getConfig("my-app")
-  val wikiTitleEndpoint = config.getString("wiki-title-endpoint")
-  val wikiArticleEndpoint = config.getString("wiki-article-endpoint")
+  val wikiEndpoint = config.getString("wiki-endpoint")
 
   implicit val system: ActorSystem = ActorSystem("YellowTaxiCluster")
-  val wikipediaActor = system.actorOf(WikipediaActor.props(wikiTitleEndpoint), "wikipediaActor")
-  startHttpServer(wikipediaActor)
+  val wikipediaTitlesActor = system.actorOf(WikipediaTitleActor.props(WikipediaCallsLihaoyi(wikiEndpoint)), "wikipediaTitlesActor")
+  val wikipediaArticleActor = system.actorOf(WikipediaArticleActor.props(WikipediaCallsLihaoyi(wikiEndpoint)), "wikipediaArticelActor")
+  startHttpServer(wikipediaTitlesActor, wikipediaArticleActor)
 }
