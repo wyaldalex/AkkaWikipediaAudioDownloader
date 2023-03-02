@@ -20,8 +20,11 @@ case class WikipediaCallsLihaoyi(endpoint: String) extends WikipediaApi {
 
     val titles = parseResult match {
       case Right(json) =>
-        val titles = json
-        Right(titles.toString())
+        val rawExtract = json.findAllByKey("extract") match {
+          case Nil => Left(s"Empty response for title $title from $articleEndpoint")
+          case x: List[Json] => Right(x(0).asString.get)
+        }
+        rawExtract
       case Left(_) =>
         Left(s"Error retrieving $title from $articleEndpoint")
     }

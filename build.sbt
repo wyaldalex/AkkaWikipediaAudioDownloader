@@ -15,7 +15,7 @@ lazy val root = (project in file(".")).
       //scalaVersion    := "2.13.4"
       scalaVersion    := "2.12.12"
     )),
-    name := "akka-http-quickstart-scala",
+    name := "wikipediatts-extract",
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http"                % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-http-spray-json"     % akkaHttpVersion,
