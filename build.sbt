@@ -25,6 +25,7 @@ lazy val root = (project in file(".")).
 
       //TTS
       "com.google.cloud" % "google-cloud-texttospeech" % "2.7.0",
+      "net.sf.sociaal" % "freetts" % "1.2.2",
 
       //Serialization
       "io.circe" %% "circe-core" % circeVersion,
